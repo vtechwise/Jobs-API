@@ -13,11 +13,15 @@ const login = async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    throw new BadRequestError("Please provide Email and Password");
+    throw new BadRequestError("Please provide Email and Passwor");
   }
   const user = await User.findOne({ email });
   if (!user) {
-    throw new UnauthenticatedError("User not found");
+    throw new UnauthenticatedError("Invalid credentials");
+  }
+  const isPasswordCorrect = await user.comparePassword(password);
+  if (!isPasswordCorrect) {
+    throw new UnauthenticatedError("Invalid credentials");
   }
 
   const token = user.createJWT();
