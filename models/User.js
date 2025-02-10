@@ -26,17 +26,24 @@ const UserScheme = new mongoose.Schema({
   },
 });
 
-UserScheme.pre("save", async function (next) {
+UserScheme.pre("save", async function () {
   const salt = await bcrypt.genSalt(10);
   const hashPassword = await bcrypt.hash(this.password, salt);
   this.password = hashPassword;
-  next();
 });
 
 UserScheme.methods.createJWT = function () {
-  return jwt.sign({ userID: this._id, name: this.name }, "jwtSecret", {
-    expiresIn: "30d",
-  });
+  return jwt.sign(
+    { userID: this._id, name: this.name },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: process.env.JWT_LIFETIME,
+    }
+  );
+};
+UserScheme.methods.comparePassword = async function (password) {
+  const isMatch = await bcrypt.compare(password, this.password);
+  return isMatch;
 };
 
 module.exports = mongoose.model("User", UserScheme);
