@@ -9,6 +9,7 @@ const errorHandlerMiddleware = require('./middleware/error-handler');
 
 // router 
 const authRouter = require('./routes/auth')
+const jobRouter = require('./routes/jobs')
 
 app.use(express.json());
 // extra packages
@@ -19,6 +20,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/v1/auth', authRouter)
+app.use('/api/v1/jobs', jobRouter)
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
