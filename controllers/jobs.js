@@ -1,15 +1,29 @@
 const { StatusCodes } = require("http-status-codes");
 const Job = require("../models/Job");
+const { JsonWebTokenError } = require("jsonwebtoken");
+const { NotFoundError } = require("../errors");
 
 const getAllJobs = async (req, res) => {
   const jobs = await Job.find({ createdBy: req.user.userId }).sort("createdAt");
-  res.status(StatusCodes.OK).json({jobs, count:jobs.length});
+  res.status(StatusCodes.OK).json({ jobs, count: jobs.length });
 };
 
 const getJob = async (req, res) => {
-  console.log(req.user);
+  const {
+    user: { userId },
+    params: { id: jobId },
+  } = req;
+  console.log(userId, jobId);
 
-  res.send("get all jobs");
+  const job =await Job.findOne({
+    _id: jobId,
+    createdBy: userId,
+  });
+  if (!job) {
+    throw new NotFoundError(`No job with this id: ${jobId}`);
+  }
+
+  res.status(StatusCodes.OK).json(job);
 };
 
 const createJob = async (req, res) => {
