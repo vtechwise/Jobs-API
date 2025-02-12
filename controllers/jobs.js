@@ -56,6 +56,12 @@ const updateJob = async (req, res) => {
 };
 
 const deleteJob = async (req, res) => {
+  const {
+    user: { userId },
+    params: { id: jobId },
+  } = req;
+  const job = await Job.findOneAndDelete({ _id: jobId, createdBy: userId });
+  res.status(StatusCodes.OK).json({ message: "Job deleted" });
   res.send("delete job");
 };
 
