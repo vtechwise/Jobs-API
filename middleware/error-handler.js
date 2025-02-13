@@ -4,7 +4,12 @@ const errorHandlerMiddleware = (err, req, res, next) => {
     statusCode: err.statusCode || 500,
     message: err.message || "Something went wrong",
   };
-
+  if (err.name === "validationError") {
+    customError.message = Object.values(err.errors)
+      .map((item) => item.message)
+      .join(",");
+    customError.statusCode = 400;
+  }
   if (err.code && err.code === 11000) {
     customError.statusCode = 400;
     customError.message = `Duplicate value entered for ${Object.keys(
